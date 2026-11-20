@@ -1,31 +1,42 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider, RequireRole } from "./lib/auth";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import HomePage from "./pages/HomePage";
+import InvitePage from "./pages/InvitePage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
-type ApiStatus = "checking" | "ok" | "unreachable";
-
-// Asks the backend for its health status through the /api proxy.
 export default function App() {
-  const [status, setStatus] = useState<ApiStatus>("checking");
-
-  useEffect(() => {
-    fetch("/api/health")
-      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-      .then((body: { status: string }) =>
-        setStatus(body.status === "ok" ? "ok" : "unreachable"),
-      )
-      .catch(() => setStatus("unreachable"));
-  }, []);
-
-  const message =
-    status === "checking"
-      ? "Checking the API…"
-      : status === "ok"
-        ? "API OK"
-        : "API not reachable. Is the backend running on port 8000?";
-
   return (
-    <main style={{ padding: "16px", fontFamily: "system-ui, sans-serif" }}>
-      <h1 style={{ fontSize: "22px" }}>LMS</h1>
-      <p>{message}</p>
-    </main>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/invite/:token" element={<InvitePage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireRole>
+                <ProfilePage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <RequireRole>
+                <HomePage />
+              </RequireRole>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }

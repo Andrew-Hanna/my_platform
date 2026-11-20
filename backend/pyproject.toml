@@ -18,3 +18,7 @@ dev = [
     "pytest>=9.2.0",
     "ruff>=0.17.6",
 ]
+
+[tool.ruff.lint]
+# FastAPI's Depends(...) in argument defaults is the standard pattern, so B008 is not useful here.
+ignore = ["B008"]

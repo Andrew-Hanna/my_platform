@@ -1,5 +1,6 @@
 """Application settings, read from environment variables or a local .env file."""
 
+from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -15,8 +16,18 @@ class Settings(BaseSettings):
 
     database_url: str
     app_env: str = "dev"
+    # Where the frontend lives; invite and reset links are built from this.
+    app_base_url: str = "http://localhost:5173"
+    # Turn on in production so the session cookie is sent over HTTPS only.
+    session_cookie_secure: bool = False
 
 
 def get_settings() -> Settings:
     """Return the settings for this process."""
     return Settings()
+
+
+@lru_cache
+def cached_settings() -> Settings:
+    """Settings read once per process, for code that runs on every request."""
+    return get_settings()

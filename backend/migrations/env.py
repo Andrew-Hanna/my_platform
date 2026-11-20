@@ -12,6 +12,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+from app import models  # noqa: F401  (registers every table on Base.metadata)
 from app.config import get_settings
 from app.db import Base
 
